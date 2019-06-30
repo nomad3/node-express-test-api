@@ -26,24 +26,20 @@ MongoClient.connect(url, function(err, client) {
           },
         ],
       } },
-      // UNWINDING topic value
-      { $unwind: {
-          path: '$entities.value',
-          preserveNullAndEmptyArrays: true,
-      } },
-      // REASSEMBLE topic value WITH FIRST item ONLY
+      
+      // REASSEMBLE topic value
       { $group: {
         _id: {
           _id: '$_id',
-          name: '$name',
           count: {$sum: 1},
           entities: {
             _id: '$entities._id',
             start_time: '$entities.start_time',
+            topic: '$entities.value',
           },
         },
         value: {
-          $first: '$entities.value',
+          count:{ $sum: "$entities.value"  },
         },
       } },
       // FIX EMPTY value
